@@ -30,32 +30,59 @@ def login_(request):
             user = form.get_user()
             login(request, user)
             student = user.student
-            return render(request, 'students_page.html', {'user': user, 'student': student})
+            return redirect('students_page')
     else:
         form = UserLoginForm()
     return render(request, 'login.html', {'form': form})
 
 
+# def students_page(request):
+#     print('1')
+#     if request.method == 'POST':
+#         student = request.user.student
+#         print(student)
+#         faculty_subjects = student.faculty.subjects.all()
+#         print(faculty_subjects)
+#
+#         selected_subjects = request.POST.getlist('students_page')
+#         print(selected_subjects)
+#
+#         if len(selected_subjects) < 3 or len(selected_subjects) > 7:
+#             return HttpResponseBadRequest("You must choose between 3 and 7 subjects.")
+#
+#         selected_subjects = Subject.objects.filter(pk__in=selected_subjects)
+#         student.subjects.set(selected_subjects)
+#
+#     else:
+#         print('2')
+#         student = request.user.student
+#         faculty_subjects = student.faculty.subjects.all()
+#         print(student.name)
+#         print(faculty_subjects)
+#
+#         context = {
+#             'user': request.user,
+#             'faculty_subjects': faculty_subjects
+#         }
+#
+#         return render(request, 'students_page.html', context)
+
 def students_page(request):
     if request.method == 'POST':
         student = request.user.student
         faculty_subjects = student.faculty.subjects.all()
-
         selected_subjects = request.POST.getlist('students_page')
-
         if len(selected_subjects) < 3 or len(selected_subjects) > 7:
             return HttpResponseBadRequest("You must choose between 3 and 7 subjects.")
-
-        selected_subjects = Subject.objects.filter(pk__in=selected_subjects)
-        student.subjects.set(selected_subjects)
-
+        else:
+            selected_subjects = Subject.objects.filter(pk__in=selected_subjects)
+            student.subjects.set(selected_subjects)
+            return render(request, 'answer.html', {'user': request.user, 'faculty_subjects': faculty_subjects})
     else:
         student = request.user.student
         faculty_subjects = student.faculty.subjects.all()
-
         context = {
             'user': request.user,
             'faculty_subjects': faculty_subjects
         }
-
         return render(request, 'students_page.html', context)
